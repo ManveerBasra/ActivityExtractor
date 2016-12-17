@@ -26,20 +26,23 @@ python activityextractor.py --service=[service] --email=[email] --password=[pass
 ## Setup Instructions
 ### Install python3
 
-If python3 is not installed:
+If python3 is not installed <br>
+Run this in a command window:
 ```
-$ sudo apt-get install python3
+sudo apt-get install python3
 ```
 ### pip install requests
-If pip3 is not installed:
+If pip3 is not installed <br>
+Run this in a command window:
 ```
-$ sudo apt-get install python3-setuptools
-$ sudo easy_install3 pip
-$ sudo mv /usr/local/bin/pip /usr/local/bin/pip-3
+sudo apt-get install python3-setuptools
+sudo easy_install3 pip
+sudo mv /usr/local/bin/pip /usr/local/bin/pip-3
 ```
 ### Install Selenium
+Run this in a command window:
 ```
-$ sudo pip3 install -U selenium
+sudo pip3 install -U selenium
 ```
 ### Install chromedriver
 
@@ -49,5 +52,5 @@ You will get a file named 'chromedriver' <br>
 Navigate to the directory where 'chromedriver' is located and execute the following command <br>
 to move chromedriver into /user/local/bin <br>
 ```
-$ sudo mv -t /usr/local/bin/ chromedriver
+sudo mv -t /usr/local/bin/ chromedriver
 ```
