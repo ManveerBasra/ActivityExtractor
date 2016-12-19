@@ -4,25 +4,6 @@ This repository gets viewing activity from user's streaming service accounts
 Based off of abhishek-vinjamoori's SubtitleExtractor <br>
 Link: https://github.com/abhishek-vinjamoori/SubtitleExtractor/blob/master/README.md
 
-## Usage Instructions
-#### If credentials are already in `userconfig.ini`
-Open a command window in directory containing `ActivityExtractor.py`
-Run this command:
-```
-python activityextractor.py --service=[service]
-```
-`[service]`: Put your streaming service here
-
-#### If credentials are NOT already in `userconfig.ini`
-Open a command window in directory containing `ActivityExtractor.py`
-Run this command:
-```
-python activityextractor.py --service=[service] --email=[email] --password=[password]
-```
-`[service]` : Put your streaming service here <br>
-`[email]`   : Put your email address for the streaming service here <br>
-`[password]`: Put your password here <br>
-
 ## Setup Instructions
 ### Install python3
 
@@ -31,7 +12,7 @@ Run this in a command window:
 ```
 sudo apt-get install python3
 ```
-### pip install requests
+### Install pip
 If pip3 is not installed <br>
 Run this in a command window:
 ```
@@ -54,3 +35,22 @@ to move chromedriver into /user/local/bin <br>
 ```
 sudo mv -t /usr/local/bin/ chromedriver
 ```
+
+## Usage Instructions
+#### If credentials are already in `userconfig.ini`
+Open a command window in directory containing `ActivityExtractor.py`
+Run this command:
+```
+python activityextractor.py --service=[service]
+```
+`[service]`: Put your streaming service here
+
+#### If credentials are NOT already in `userconfig.ini`
+Open a command window in directory containing `ActivityExtractor.py`
+Run this command:
+```
+python activityextractor.py --service=[service] --email=[email] --password=[password]
+```
+`[service]` : Put your streaming service here <br>
+`[email]`   : Put your email address for the streaming service here <br>
+`[password]`: Put your password here <br>
