@@ -23,16 +23,15 @@ class HuluActivityExtractor:
         self.driver = None
         self.activity_list = []
 
-    def getActivity(self):
+    def get_activity(self):
         """
         The main function that lets the user download their Hulu activity
         """
-        self.loginHulu()
+        self.login_hulu()
 
-    def loginHulu(self):
+    def login_hulu(self):
         """
         Logs into Hulu
-        Calls: getActiveProfile()
         """
         print('Logging into Hulu')
 
@@ -107,15 +106,14 @@ class HuluActivityExtractor:
 
         # Only navigate site if login was successful
         if logged_in:
-            self.navigateSite()
+            self.navigate_site()
         else:
             print('Error: Incorrect Credentials.\n' 
                   + '       Please check if you entered the correct email and password in \'userconfig.ini\'')
 
-    def navigateSite(self):
+    def navigate_site(self):
         """
         Navigates to 'History' page
-        Calls: navigatePages()
         """
         # Wait for browse page to load
         print('Navigating Site')
@@ -124,12 +122,11 @@ class HuluActivityExtractor:
         self.driver.get('https://secure.hulu.com/account/history')
 
         # Call next function to get viewing activity and proceed to next pages
-        self.navigatePages()
+        self.navigate_pages()
 
-    def navigatePages(self):
+    def navigate_pages(self):
         """
         Scrolls to bottom of 'Watch History' page
-        Calls: outputActivity()
         """
 
         print('Retrieving viewing activity')
@@ -137,21 +134,21 @@ class HuluActivityExtractor:
         # List that is filled with strings of viewing activity
         self.activity_list = []
 
-        lastpage = 1
-        currentpage = 1
+        last_page = 1
+        current_page = 1
         # Get total number of pages
         try:
-            lastpage = int(self.driver.find_element_by_class_name('last-page-button').text)
+            last_page = int(self.driver.find_element_by_class_name('last-page-button').text)
         except:
             pass
 
         print('Progress:')
         done = False
         while not done:
-            self.getPageActivity(lastpage, currentpage)
+            self.get_page_activity(last_page, current_page)
             try:
                 self.driver.find_elements_by_class_name('next-page-button')[1].click()
-                currentpage += 1
+                current_page += 1
             except ElementNotVisibleException:
                 done = True
 
@@ -159,9 +156,9 @@ class HuluActivityExtractor:
         # Close driver
         self.driver.close()
 
-        common.outputActivity(SERVICE, self.activity_list)
+        common.output_activity(SERVICE, self.activity_list)
 
-    def getPageActivity(self, lastpage, currentpage):
+    def get_page_activity(self, last_page, current_page):
         """
         Gets all viewing activity on current page
         """
@@ -171,7 +168,7 @@ class HuluActivityExtractor:
         for row, i in zip(row_list, range(len(row_list))):
             self.activity_list.append(row.text + '\n')
             page_percent_comp = i / len(row_list)
-            percent_comp = page_percent_comp * (currentpage / lastpage)
+            percent_comp = page_percent_comp * (current_page / last_page)
             fill_bar = round(19 * percent_comp)
             print('\t[' + ('#' * fill_bar) + (' ' * (20 - fill_bar)) + '] ' + str(round(percent_comp * 100)) + '%',
                   end='\r')

@@ -23,16 +23,15 @@ class NetflixActivityExtractor:
         self.parameters = parameters
         self.driver = None
 
-    def getActivity(self):
+    def get_activity(self):
         """
         The main function that lets the user download their Netflix activity
         """
-        self.loginNetflix()
+        self.login_netflix()
 
-    def loginNetflix(self):
+    def login_netflix(self):
         """
         Logs into Netflix
-        Calls: getActiveProfile()
         """
         print('Logging into Netflix')
 
@@ -50,7 +49,7 @@ class NetflixActivityExtractor:
         if not args_passed:
             self.driver = webdriver.Chrome()
         self.driver.get(self.parameters['url'])
-        mutliPageLogin = False
+        mutli_page_login = False
 
         # Clearing email textbox and typing in user's email
         self.driver.find_element_by_name('email').clear()
@@ -62,11 +61,11 @@ class NetflixActivityExtractor:
         except NoSuchElementException:
             # It is a double page login. So we first need to click on "Next" and then send the password
             self.driver.find_element_by_class_name('login-button').click()
-            mutliPageLogin = True
+            mutli_page_login = True
 
         time.sleep(1)
 
-        if mutliPageLogin:
+        if mutli_page_login:
             self.driver.find_element_by_name('password').clear()
 
         # Typing in user's password
@@ -91,15 +90,14 @@ class NetflixActivityExtractor:
             logged_in = False
 
         if logged_in:
-            self.getActiveProfile()
+            self.get_active_profile()
         else:
             print('Error: Incorrect Credentials.\n' 
                   + '       Please check if you entered the correct email and password in \'userconfig.ini\'')
 
-    def getActiveProfile(self):
+    def get_active_profile(self):
         """
         Selects Netflix profile
-        Calls:  navigateSite()
         """
         # Obtain profiles and names
         profiles = self.driver.find_elements_by_class_name('profile-icon')
@@ -114,7 +112,7 @@ class NetflixActivityExtractor:
                     if users[i].text == self.parameters['user']:
                         # Click profile image associated with name
                         profiles[i].click()
-                        self.navigateSite()
+                        self.navigate_site()
                     elif i == len(profiles):
                         print('Error: Your profile name (\'%s\') was not found.\n' % self.parameters['user']
                               + '       Please check if you entered the correct profile name in \'userconfig.ini\'')
@@ -123,39 +121,39 @@ class NetflixActivityExtractor:
                 except WebDriverException:
                     pass
 
-    def navigateSite(self):
+    def navigate_site(self):
         """
         Navigates to 'Viewing Activity' page
-        Calls: hoverClick(), scrollToBottom()
         """
         # Wait for browse page to load
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'profile-icon')))
         print('Navigating Site')
 
         time.sleep(2)
-        hoverClicked = self.hoverClick()
+        hover_clicked = self.hover_click()
 
         # Navigate to page containing viewing activity
-        if hoverClicked:
+        if hover_clicked:
             self.driver.find_element_by_link_text('Viewing activity').click()
-            self.scrollToBottom()
+            self.scroll_to_bottom()
         else:
             print('Closing Program')
 
-    def hoverClick(self):
+    def hover_click(self):
         """
         Hovers on user avatar and clicks 'Your Account'
         Returns: Boolean
         """
         # Hover then click sometimes fails, so it runs until it works with a maximum of 3 attempts
-        hov_profile = self.driver.find_element_by_class_name('profile-icon')
-        error_count = 1
+        error_count = 0
         while True:
             try:
                 # On some systems the profile icon is displayed differently.
                 # For this reason if the previous attempt doesn't work,
                 # the program searches for a different item that will do the same thing when clicked as the profile-icon
-                if error_count == 1:
+                if error_count == 0:
+                    hov_profile = self.driver.find_element_by_class_name('profile-icon')
+                elif error_count == 1:
                     hov_profile = self.driver.find_element_by_class_name('profile-name')
                 elif error_count == 2:
                     hov_profile = self.driver.find_element_by_class_name('profile-arrow')
@@ -186,29 +184,29 @@ class NetflixActivityExtractor:
             except:
                 error_count += 1
 
-    def scrollToBottom(self):
+    def scroll_to_bottom(self):
         """
         Scrolls to bottom of 'Viewing Activity' page
-        Calls: outputActivity()
         """
 
         print('Scrolling to bottom of page (this may take a while)')
 
         # Scroll to the bottom of the page
-        lenOfPageScript = \
-            'window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;'
-        lenOfPage = self.driver.execute_script(lenOfPageScript)
+        len_of_page_script = \
+            'window.scrollTo(0, document.body.scrollHeight);'' \
+            ''var len_of_page=document.body.scrollHeight;return len_of_page;'
+        len_of_page = self.driver.execute_script(len_of_page_script)
         match = False
         while not match:
-            lastCount = lenOfPage
+            last_count = len_of_page
             time.sleep(2)
-            lenOfPage = self.driver.execute_script(lenOfPageScript)
-            if lastCount == lenOfPage:
+            len_of_page = self.driver.execute_script(len_of_page_script)
+            if last_count == len_of_page:
                 match=True
 
-        self.getPageActivity()
+        self.get_page_activity()
 
-    def getPageActivity(self):
+    def get_page_activity(self):
         """
         Gets viewing activity and outputs into 'netflix_activity.txt'
         """
@@ -228,10 +226,11 @@ class NetflixActivityExtractor:
             # Display progress bar to user
             percent_comp = i / len(row_list)
             fill_bar = round(19 * percent_comp)
-            print('\t[' + ('#' * fill_bar) + (' ' * (20-fill_bar)) + '] ' + str(round(percent_comp*100)) + '%', end='\r')
+            print('\t[' + ('#' * fill_bar) + (' ' * (20-fill_bar)) + '] ' + str(round(percent_comp*100)) + '%',
+                  end='\r')
 
         print('\t[' + ('#' * 20) + ']' + ' 100%')
         # Close driver
         self.driver.close()
 
-        common.outputActivity(SERVICE, activity_list)
+        common.output_activity(SERVICE, activity_list)

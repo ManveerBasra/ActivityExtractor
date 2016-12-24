@@ -5,21 +5,18 @@ from amazon import AmazonActivityExtractor
 from hulu import HuluActivityExtractor
 from netflix import NetflixActivityExtractor
 from configparser import ConfigParser
-import getopt
+import argparse
 import sys
 
 
 class ActivityExtractor:
-    def __init__(self, service, email, password, user):
-        self.service = service.lower()
-        self.email = email
-        self.password = password
-        self.user = user
+    def __init__(self):
+        self.args = None
 
         self.chrome_args = None
         self.url = None
 
-        self.serviceClass = None
+        self.service_class = None
 
         self.supported_services = {
             'amazon': AmazonActivityExtractor,
@@ -27,15 +24,16 @@ class ActivityExtractor:
             'netflix': NetflixActivityExtractor}
 
     def run(self):
-        self.checkService()
-        self.getCredentials()
-        self.checkCredentials()
-        self.runProcess()
+        self.init_arguments()
+        self.check_service()
+        self.get_credentials()
+        self.check_credentials()
+        self.run_process()
 
-    def checkService(self):
+    def check_service(self):
         supported = False
         for service in self.supported_services:
-            if self.service == service:
+            if self.args.service == service:
                 supported = True
 
         if not supported:
@@ -45,37 +43,37 @@ class ActivityExtractor:
                 print('  %s' % s)
             sys.exit(2)
 
-    def getCredentials(self):
+    def get_credentials(self):
         # Initialising the parser
         parser = ConfigParser()
         parser.read('userconfig.ini')
         parser.optionxform = str
 
         # User credentials parsing dictionary
-        parsingDictionary = {'service': self.service.upper()}
+        parsing_dictionary = {'service': self.args.service.upper()}
 
         # Chrome parsing dictionary
-        chromeParsingDictionary = {'service': 'CHROME'}
+        chrome_parsing_dictionary = {'service': 'CHROME'}
 
         # Potential chrome options obtained from arguments variable
-        raw_chrome_args = parser.get(chromeParsingDictionary['service'], 'arguments')
+        raw_chrome_args = parser.get(chrome_parsing_dictionary['service'], 'arguments')
         if raw_chrome_args.strip() != '':
-            self.chrome_args = self.parseChromeArgs(raw_chrome_args)
+            self.chrome_args = self.parse_chrome_args(raw_chrome_args)
 
         # Get url for browser
-        self.url = parser.get(parsingDictionary['service'], 'url')
+        self.url = parser.get(parsing_dictionary['service'], 'url')
 
-        if self.email is None:
-            self.email = parser.get(parsingDictionary['service'], 'email')
+        if self.args.email is None:
+            self.args.email = parser.get(parsing_dictionary['service'], 'email')
 
-        if self.password is None:
-            self.password = parser.get(parsingDictionary['service'], 'password')
+        if self.args.password is None:
+            self.args.password = parser.get(parsing_dictionary['service'], 'password')
 
         # Netflix has an extra parameter for profile_name
-        if self.service == 'netflix':
-            self.user = parser.get(parsingDictionary['service'], 'profile_name')
+        if self.args.service == 'netflix':
+            self.args.user = parser.get(parsing_dictionary['service'], 'profile_name')
 
-    def parseChromeArgs(self, args):
+    def parse_chrome_args(self, args):
         """
             Breaks up args, adds them to an instance of ChromeOptions and returns the result
             """
@@ -89,99 +87,57 @@ class ActivityExtractor:
 
         return chrome_options
 
-    def checkCredentials(self):
-        if self.email is None:
+    def check_credentials(self):
+        if self.args.email is None:
             print('--email is missing\n'
                   + 'add email into \'userconfig.ini\''
                   + 'or provide email using --email')
             sys.exit(2)
-        if self.password is None:
+        if self.args.password is None:
             print('--password is missing\n'
                   + 'add password into \'userconfig.ini\''
                   + 'or provide password using --password')
             sys.exit(2)
 
-    def runProcess(self):
-        self.serviceClass = self.supported_services[self.service]({
+    def run_process(self):
+        self.service_class = self.supported_services[self.args.service]({
             'url': self.url,
-            'email': self.email,
-            'password': self.password,
+            'email': self.args.email,
+            'password': self.args.password,
             'chrome_args': self.chrome_args,
-            'user': self.user})
+            'user': self.args.user})
 
-        self.serviceClass.getActivity()
+        self.service_class.get_activity()
 
-usageOptions = [
-    '-h, --help',
-    '-s, --service',
-    '-e, --email',
-    '-p, --password',
-    '-u, --user'
-]
+    def init_arguments(self):
+        """
+        Initialize command line argument parser and define acceptable arguments
+        """
+        parser = argparse.ArgumentParser(description='This repository gets viewing activity from user\'s streaming '
+                                                     'service accounts.')
+        parser.add_argument('service',
+                            help='Specify streaming service to get viewing activity from.')
+        parser.add_argument('--email=',
+                            dest='email',
+                            nargs=1,
+                            help='Specify email address.')
+        parser.add_argument('--password=',
+                            dest='password',
+                            nargs=1,
+                            help='Specify password required for login.')
+        parser.add_argument('--user=',
+                            dest='user',
+                            nargs=1,
+                            help='Specify user (Only required for Netflix).')
 
-usageDescriptions = [
-    'Show help.',
-    'Specify streaming service to get viewing activity from.',
-    'Specify email address.',
-    'Specify password required for login.',
-    'Specify user (Only required for Netflix)',
-]
-
-
-def displayUsage():
-    print('\nUsage:\n  python activityextractor.py [options]')
-    print('\nGeneral Options:')
-    for option, desc in zip(usageOptions, usageDescriptions):
-        if len(desc) > 50:
-            print('  '
-                  + option
-                  + ' ' * (28 - len(option))
-                  + desc[:49].strip())
-            print(' ' * 30
-                  + desc[49:].strip())
-        else:
-            print('  '
-                  + option
-                  + ' '*(28-len(option))
-                  + desc)
+        # Assign command line arguments to class variable
+        self.args = parser.parse_args()
 
 
-def main(argv):
-    # Get arguments passed on command line
-    try:
-        opts, args = getopt.getopt(argv, 's:e:p:u:h', ['service=', 'email=', 'password=','user=', 'help'])
-    except getopt.GetoptError:
-        displayUsage()
-        sys.exit(2)
-
-    service = None
-    email = None
-    password = None
-    user = None
-    for opt, arg in opts:
-        if opt in ('-h', '--help'):
-            displayUsage()
-            sys.exit(2)
-        elif opt in ('s', '--service'):
-            service = arg
-        elif opt in ('-e', '--email'):
-            email = arg
-        elif opt in ('-p', '--password'):
-            password = arg
-        elif opt in ('-u', '--user'):
-            user = arg
-        else:
-            displayUsage()
-            sys.exit(2)
-
-    if service is not None:
-        extractor = ActivityExtractor(service, email, password, user)
-    else:
-        print('--service is missing')
-        sys.exit(2)
-
+def main():
+    extractor = ActivityExtractor()
     extractor.run()
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

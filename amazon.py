@@ -19,13 +19,17 @@ class AmazonActivityExtractor:
         self.driver = None
         self.activity_list = []
 
-    def getActivity(self):
+    def get_activity(self):
         """
         The main function that lets the user download their Amazon activity
         """
-        self.loginAmazon()
+        self.login_amazon()
 
-    def loginAmazon(self):
+    def login_amazon(self):
+        """
+        Logs into Amazon
+        """
+        
         print('Logging into Amazon')
 
         # Keep track of whether user passed options in 'userconfig.ini'
@@ -58,12 +62,11 @@ class AmazonActivityExtractor:
         # Navigate to viewing activity page
         self.driver.get('https://www.amazon.com/gp/yourstore/iyr/ref=pd_ys_iyr_edit_watched?ie=UTF8&collection=watched')
 
-        self.navigatePages()
+        self.navigate_pages()
 
-    def navigatePages(self):
+    def navigate_pages(self):
         """
         Navigates to the Viewing History page
-        Calls: outputActivity()
         """
         print('Retrieving viewing activity...')
 
@@ -72,16 +75,16 @@ class AmazonActivityExtractor:
 
         done = False
         while not done:
-            self.getPageActivity()
+            self.get_page_activity()
             try:
                 self.driver.find_element_by_id('iyrNext').click()
                 time.sleep(1)
             except WebDriverException:
                 done = True
 
-        common.outputActivity(SERVICE, self.activity_list)
+        common.output_activity(SERVICE, self.activity_list)
 
-    def getPageActivity(self):
+    def get_page_activity(self):
         """
         Gets all viewing activity on current page
         """

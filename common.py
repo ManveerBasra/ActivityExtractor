@@ -1,7 +1,7 @@
 import codecs
 
 
-def outputActivity(service, activity_list):
+def output_activity(service, activity_list):
     """
     Outputs viewing activity into 'SERVICE_activity.txt'
     """
