@@ -7,7 +7,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import common
-import time
 
 SERVICE = 'HULU'
 
@@ -38,16 +37,8 @@ class HuluActivityExtractor:
         # Keep track of whether login was successful
         logged_in = True
 
-        # Keep track of whether user passed options in 'userconfig.ini'
-        args_passed = False
-
-        if self.parameters['chrome_args'] != '':
-            args_passed = True
-            self.driver = webdriver.Chrome(chrome_options=self.parameters['chrome_args'])
-
-        # Initialising Chrome driver
-        if not args_passed:
-            self.driver = webdriver.Chrome()
+        # Initialising PhantomJS driver
+        self.driver = webdriver.Chrome()
         self.driver.get(self.parameters['url'])
 
         # Close potential pop-ups
@@ -86,11 +77,10 @@ class HuluActivityExtractor:
         self.driver.find_element_by_class_name('btn-login').click()
 
         # Sometimes Hulu displays a reCAPTCHA container
-        # Incase that happens, ask user to complete it and press 'Login'
+        # Incase that happens, ask user to retry script in a few minutes
         try:
             WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'reCAPTCHA')))
-            print('Please complete the reCAPTCHA task and press \'Login\'')
-            input('Switch back to this window and press enter when you\'re done: ')
+            print('A reCAPTCHA appeared, try running script again in a few minutes.')
         except TimeoutException:
             pass
 
@@ -118,7 +108,6 @@ class HuluActivityExtractor:
         # Wait for browse page to load
         print('Navigating Site')
 
-        time.sleep(2)
         self.driver.get('https://secure.hulu.com/account/history')
 
         # Call next function to get viewing activity and proceed to next pages

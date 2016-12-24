@@ -38,16 +38,8 @@ class NetflixActivityExtractor:
         # Keep track of whether login was successful
         logged_in = True
 
-        # Keep track of whether user passed options in 'userconfig.ini'
-        args_passed = False
-
-        if self.parameters['chrome_args'] != '':
-            args_passed = True
-            self.driver = webdriver.Chrome(chrome_options=self.parameters['chrome_args'])
-
-        # Initialising Chrome driver
-        if not args_passed:
-            self.driver = webdriver.Chrome()
+        # Initialising PhantomJS driver
+        self.driver = webdriver.PhantomJS()
         self.driver.get(self.parameters['url'])
         mutli_page_login = False
 
@@ -62,8 +54,6 @@ class NetflixActivityExtractor:
             # It is a double page login. So we first need to click on "Next" and then send the password
             self.driver.find_element_by_class_name('login-button').click()
             mutli_page_login = True
-
-        time.sleep(1)
 
         if mutli_page_login:
             self.driver.find_element_by_name('password').clear()
@@ -129,7 +119,7 @@ class NetflixActivityExtractor:
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'profile-icon')))
         print('Navigating Site')
 
-        time.sleep(2)
+        time.sleep(1)
         hover_clicked = self.hover_click()
 
         # Navigate to page containing viewing activity
@@ -176,8 +166,6 @@ class NetflixActivityExtractor:
                 hov = ActionChains(self.driver).move_to_element(hov_profile)
                 hov.perform()
 
-                time.sleep(1)
-
                 # Click on 'Your Account' which appears from drop-down menu provoked in previous step
                 self.driver.find_element_by_link_text('Your Account').click()
                 return True
@@ -199,7 +187,7 @@ class NetflixActivityExtractor:
         match = False
         while not match:
             last_count = len_of_page
-            time.sleep(2)
+            time.sleep(1)
             len_of_page = self.driver.execute_script(len_of_page_script)
             if last_count == len_of_page:
                 match=True

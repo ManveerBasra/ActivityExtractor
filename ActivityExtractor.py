@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from selenium import webdriver
 from amazon import AmazonActivityExtractor
 from hulu import HuluActivityExtractor
 from netflix import NetflixActivityExtractor
@@ -13,7 +12,6 @@ class ActivityExtractor:
     def __init__(self):
         self.args = None
 
-        self.chrome_args = None
         self.url = None
 
         self.service_class = None
@@ -52,14 +50,6 @@ class ActivityExtractor:
         # User credentials parsing dictionary
         parsing_dictionary = {'service': self.args.service.upper()}
 
-        # Chrome parsing dictionary
-        chrome_parsing_dictionary = {'service': 'CHROME'}
-
-        # Potential chrome options obtained from arguments variable
-        raw_chrome_args = parser.get(chrome_parsing_dictionary['service'], 'arguments')
-        if raw_chrome_args.strip() != '':
-            self.chrome_args = self.parse_chrome_args(raw_chrome_args)
-
         # Get url for browser
         self.url = parser.get(parsing_dictionary['service'], 'url')
 
@@ -72,20 +62,6 @@ class ActivityExtractor:
         # Netflix has an extra parameter for profile_name
         if self.args.service == 'netflix':
             self.args.user = parser.get(parsing_dictionary['service'], 'profile_name')
-
-    def parse_chrome_args(self, args):
-        """
-            Breaks up args, adds them to an instance of ChromeOptions and returns the result
-            """
-        chrome_options = webdriver.ChromeOptions()
-        if ',' in args:
-            options_list = args.split(',')
-            for option in options_list:
-                chrome_options.add_argument(option.strip())
-        else:
-            chrome_options.add_argument(args)
-
-        return chrome_options
 
     def check_credentials(self):
         if self.args.email is None:
@@ -104,7 +80,6 @@ class ActivityExtractor:
             'url': self.url,
             'email': self.args.email,
             'password': self.args.password,
-            'chrome_args': self.chrome_args,
             'user': self.args.user})
 
         self.service_class.get_activity()

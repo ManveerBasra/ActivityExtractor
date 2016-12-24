@@ -32,29 +32,17 @@ class AmazonActivityExtractor:
         
         print('Logging into Amazon')
 
-        # Keep track of whether user passed options in 'userconfig.ini'
-        args_passed = False
-
-        if self.parameters['chrome_args'] != '':
-            args_passed = True
-            self.driver = webdriver.Chrome(chrome_options=self.parameters['chrome_args'])
-
-        # Initialising Chrome driver
-        if not args_passed:
-            self.driver = webdriver.Chrome()
+        # Initialising PhantomJS driver
+        self.driver = webdriver.PhantomJS()
         self.driver.get(self.parameters['url'])
 
         # Clearing email textbox and typing in user's email
         self.driver.find_element_by_id('ap_email').clear()
         self.driver.find_element_by_id('ap_email').send_keys(self.parameters['email'])
 
-        time.sleep(1)
-
         # Clearing password textbox and typing in user's password
         self.driver.find_element_by_id('ap_password').clear()
         self.driver.find_element_by_id('ap_password').send_keys(self.parameters['password'])
-
-        time.sleep(1)
 
         # Clicking on submit button
         self.driver.find_element_by_id('signInSubmit').click()
