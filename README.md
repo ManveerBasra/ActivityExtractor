@@ -1,5 +1,6 @@
 # ActivityExtractor
-This repository gets viewing activity from user's streaming service accounts
+This repository gets viewing activity from user's streaming service accounts. <br>
+Developed during GCI 2016
 
 Based off of abhishek-vinjamoori's SubtitleExtractor <br>
 Link: https://github.com/abhishek-vinjamoori/SubtitleExtractor/blob/master/README.md
