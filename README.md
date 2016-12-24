@@ -1,5 +1,6 @@
 # ActivityExtractor
-This repository gets viewing activity from user's streaming service accounts
+This repository gets viewing activity from user's streaming service accounts. <br>
+Developed during GCI 2016
 
 Based off of abhishek-vinjamoori's SubtitleExtractor <br>
 Link: https://github.com/abhishek-vinjamoori/SubtitleExtractor/blob/master/README.md
@@ -25,15 +26,11 @@ Run this in a command window:
 ```
 sudo pip3 install -U selenium
 ```
-### Install chromedriver
-
-Make sure you already have Google Chrome installed. <br>
-Then download and extract the contents of - http://chromedriver.storage.googleapis.com/index.html?path=2.25/ <br>
-You will get a file named 'chromedriver' <br>
-Navigate to the directory where 'chromedriver' is located and execute the following command <br>
-to move chromedriver into /user/local/bin <br>
+### Install PhantomJS
+Make sure you have NodeJS installed (https://nodejs.org/)<br>
+Using Node's package manager run this in a command window:
 ```
-sudo mv -t /usr/local/bin/ chromedriver
+npm -g install phantomjs-prebuilt
 ```
 
 ## Usage Instructions
@@ -41,16 +38,22 @@ sudo mv -t /usr/local/bin/ chromedriver
 Open a command window in directory containing `ActivityExtractor.py`
 Run this command:
 ```
-python activityextractor.py --service=[service]
+python activityextractor.py "service"
 ```
-`[service]`: Put your streaming service here
+`"service"` : Put your streaming service here **(Make sure to include the quotes)** <br>
 
 #### If credentials are NOT already in `userconfig.ini`
 Open a command window in directory containing `ActivityExtractor.py`
 Run this command:
 ```
-python activityextractor.py --service=[service] --email=[email] --password=[password]
+python activityextractor.py "service" --email=[email] --password=[password]
 ```
-`[service]` : Put your streaming service here <br>
+`"service"` : Put your streaming service here **(Make sure to include the quotes)** <br>
 `[email]`   : Put your email address for the streaming service here <br>
 `[password]`: Put your password here <br>
+
+If you're getting activity from Netflix, you must include an additional parameter:
+```
+--user=[user]
+```
+`[user]`    : Put your Netflix username here
