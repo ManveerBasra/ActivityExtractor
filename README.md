@@ -54,6 +54,6 @@ python activityextractor.py [service] --email=[email] --password=[password]
 
 If you're getting activity from Netflix, you must include an additional parameter:
 ```
---user=[user]
+... --user=[user]
 ```
 `[user]`    : Put your Netflix username here
