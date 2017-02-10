@@ -134,29 +134,24 @@ class NetflixActivityExtractor:
         Hovers on user avatar and clicks 'Your Account'
         Returns: Boolean
         """
-        # Hover then click sometimes fails, so it runs until it works with a maximum of 3 attempts
         error_count = 0
+        prof_icon_classes = [
+            'profile-icon',
+            'profile-name',
+            'profile-arrow',
+            'avatar',
+            'profile-link',
+            'account-dropdown-button',
+            'account-menu-item',
+            'current-profile'
+        ]
         while True:
             try:
                 # On some systems the profile icon is displayed differently.
-                # For this reason if the previous attempt doesn't work,
+                # For this reason the first attempt doesn't work,
                 # the program searches for a different item that will do the same thing when clicked as the profile-icon
-                if error_count == 0:
-                    hov_profile = self.driver.find_element_by_class_name('profile-icon')
-                elif error_count == 1:
-                    hov_profile = self.driver.find_element_by_class_name('profile-name')
-                elif error_count == 2:
-                    hov_profile = self.driver.find_element_by_class_name('profile-arrow')
-                elif error_count == 3:
-                    hov_profile = self.driver.find_element_by_class_name('avatar')
-                elif error_count == 4:
-                    hov_profile = self.driver.find_element_by_class_name('profile-link')
-                elif error_count == 5:
-                    hov_profile = self.driver.find_element_by_class_name('account-dropdown-button')
-                elif error_count == 6:
-                    hov_profile = self.driver.find_element_by_class_name('account-menu-item')
-                elif error_count == 7:
-                    hov_profile = self.driver.find_element_by_class_name('current-profile')
+                if error_count <= 7:
+                    hov_profile = self.driver.find_element_by_class_name(prof_icon_classes[error_count])
                 else:
                     print('Error: Program was unable to find profile picture.\n'
                           + '       Please report this issue to m13basra@gmail.com')
@@ -181,8 +176,8 @@ class NetflixActivityExtractor:
 
         # Scroll to the bottom of the page
         len_of_page_script = \
-            'window.scrollTo(0, document.body.scrollHeight);'' \
-            ''var len_of_page=document.body.scrollHeight;return len_of_page;'
+            'window.scrollTo(0, document.body.scrollHeight);' \
+            'var len_of_page=document.body.scrollHeight;return len_of_page;'
         len_of_page = self.driver.execute_script(len_of_page_script)
         match = False
         while not match:
