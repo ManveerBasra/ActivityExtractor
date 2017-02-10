@@ -38,22 +38,22 @@ npm -g install phantomjs-prebuilt
 Open a command window in directory containing `ActivityExtractor.py`
 Run this command:
 ```
-python activityextractor.py "service"
+python activityextractor.py [service]
 ```
-`"service"` : Put your streaming service here **(Make sure to include the quotes)** <br>
+`[service]` : Put your streaming service here <br>
 
 #### If credentials are NOT already in `userconfig.ini`
 Open a command window in directory containing `ActivityExtractor.py`
 Run this command:
 ```
-python activityextractor.py "service" --email=[email] --password=[password]
+python activityextractor.py [service] --email=[email] --password=[password]
 ```
-`"service"` : Put your streaming service here **(Make sure to include the quotes)** <br>
+`[service]` : Put your streaming service here <br>
 `[email]`   : Put your email address for the streaming service here <br>
 `[password]`: Put your password here <br>
 
 If you're getting activity from Netflix, you must include an additional parameter:
 ```
---user=[user]
+... --user=[user]
 ```
 `[user]`    : Put your Netflix username here
