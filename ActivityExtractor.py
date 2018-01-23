@@ -1,4 +1,7 @@
-#!/usr/bin/python3
+"""
+Module for Activity Extractor
+"""
+# !/usr/bin/python3
 
 from amazon import AmazonActivityExtractor
 from hulu import HuluActivityExtractor
@@ -7,41 +10,59 @@ from configparser import ConfigParser
 import argparse
 import sys
 
+SUPPORTED_SERVICES = {
+    'amazon': AmazonActivityExtractor,
+    'hulu': HuluActivityExtractor,
+    'netflix': NetflixActivityExtractor
+}
+
 
 class ActivityExtractor:
+    """
+    Represent an main Activity Extractor object that's used to parse
+    command-line arguments and call the given activity
+    """
+
     def __init__(self):
+        """
+        Initialize a new ActivityExtractor object
+        """
         self.args = None
 
         self.url = None
 
         self.service_class = None
 
-        self.supported_services = {
-            'amazon': AmazonActivityExtractor,
-            'hulu': HuluActivityExtractor,
-            'netflix': NetflixActivityExtractor}
-
-    def run(self):
+    def run(self) -> None:
+        """
+        Main function to initialize arguments and call the given activity
+        """
+        # Initialize arguments and check whether the given service is supported
         self.init_arguments()
         self.check_service()
+
+        # Get login credentials and check whether they're valid
         self.get_credentials()
         self.check_credentials()
+
+        # Call given activity
         self.run_process()
 
-    def check_service(self):
-        supported = False
-        for service in self.supported_services:
-            if self.args.service == service:
-                supported = True
-
-        if not supported:
+    def check_service(self) -> None:
+        """
+        Check whether service in self.args is supported
+        """
+        if self.args.service not in SUPPORTED_SERVICES:
             print('Service not supported')
             print('Supported services include:')
-            for s in self.supported_services.keys():
+            for s in SUPPORTED_SERVICES.keys():
                 print('  %s' % s)
             sys.exit(2)
 
-    def get_credentials(self):
+    def get_credentials(self) -> None:
+        """
+        Get login credentials and add them to self.args
+        """
         # Initialising the parser
         parser = ConfigParser()
         parser.read('userconfig.ini')
@@ -57,13 +78,18 @@ class ActivityExtractor:
             self.args.email = parser.get(parsing_dictionary['service'], 'email')
 
         if self.args.password is None:
-            self.args.password = parser.get(parsing_dictionary['service'], 'password')
+            self.args.password = parser.get(parsing_dictionary['service'],
+                                            'password')
 
         # Netflix has an extra parameter for profile_name
         if self.args.service == 'netflix':
-            self.args.user = parser.get(parsing_dictionary['service'], 'profile_name')
+            self.args.user = parser.get(parsing_dictionary['service'],
+                                        'profile_name')
 
     def check_credentials(self):
+        """
+        Check whether the given credentials in self.args are valid
+        """
         if self.args.email is None:
             print('--email is missing\n'
                   + 'add email into \'userconfig.ini\''
@@ -76,11 +102,15 @@ class ActivityExtractor:
             sys.exit(2)
 
     def run_process(self):
-        self.service_class = self.supported_services[self.args.service]({
+        """
+        Take the given arguments in self.args and call the given service class
+        """
+        self.service_class = SUPPORTED_SERVICES[self.args.service]({
             'url': self.url,
             'email': self.args.email,
             'password': self.args.password,
-            'user': self.args.user})
+            'user': self.args.user
+        })
 
         self.service_class.get_activity()
 
@@ -88,10 +118,12 @@ class ActivityExtractor:
         """
         Initialize command line argument parser and define acceptable arguments
         """
-        parser = argparse.ArgumentParser(description='This repository gets viewing activity from user\'s streaming '
-                                                     'service accounts.')
-        parser.add_argument('service',
-                            help='Specify streaming service to get viewing activity from.')
+        parser = argparse.ArgumentParser(
+            description='This repository gets viewing activity from user\'s '
+                        'streaming service accounts.')
+        parser.add_argument(
+            'service',
+            help='Specify streaming service to get viewing activity from.')
         parser.add_argument('--email=',
                             dest='email',
                             nargs=1,
@@ -108,11 +140,6 @@ class ActivityExtractor:
         # Assign command line arguments to class variable
         self.args = parser.parse_args()
 
-
-def main():
+if __name__ == "__main__":
     extractor = ActivityExtractor()
     extractor.run()
-
-
-if __name__ == "__main__":
-    main()
