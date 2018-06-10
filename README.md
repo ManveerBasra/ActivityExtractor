@@ -5,6 +5,10 @@ Gets viewing activity from user's streaming service accounts <br>
 Based off of abhishek-vinjamoori's SubtitleExtractor <br>
 Link: https://github.com/abhishek-vinjamoori/SubtitleExtractor/blob/master/README.md
 
+More Documentation:
+  User - https://www.ccextractor.org/public:codein:activity_extractor_user_docs
+  Technical - https://www.ccextractor.org/public:codein:activity_extractor_technical_docs
+
 ## Setup Instructions
 ### Install python3
 
